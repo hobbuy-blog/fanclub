@@ -176,9 +176,9 @@
 </head>
 <body>
   <header>
-    <div class="site-title"><a href="../index.html"><b style="font-size: 1.5em;">Hobbuy Blog</b><br><b><small>趣味と購入のブログ</small></b></a></div>
+    <div class="site-title"><a href="../index.html"><b style="font-size: 1.5em;">Hobbuy Blog</b><br><b><small>Fan Club</small></b></a></div>
     <nav>
-      <a href="#top">ページトップ</a>
+      <a href="./dashboard.html">ダッシュボード</a>
     </nav>
   </header>
 
@@ -193,7 +193,7 @@
     
     <form id="registrationForm">
       <div class="form-group">
-        <label for="nickname">ニックネーム <span class="required">*</span></label>
+        <label for="nickname">お名前(ニックネーム) <span class="required">*</span></label>
         <input type="text" id="nickname" name="nickname" required minlength="2" maxlength="20" placeholder="例: Hobbuy太郎">
       </div>
 
@@ -227,10 +227,6 @@
       <button type="submit" class="submit-btn" id="submitBtn">会員登録する</button>
     </form>
   </div>
-
-  <p style="margin-top: 2em;">
-    <a href="fanclub-top.html">←ファンクラブトップに戻る</a>
-  </p>
 
   <script>
     // Firebase設定
@@ -338,8 +334,7 @@
         // EmailJS経由でウェルカムメール送信
         await emailjs.send('service_70cfhpd', 'registerComplete', {
           to_email: email,
-          to_name: nickname,
-          message: 'Hobbuy Blogファンクラブへのご登録ありがとうございます。'
+          to_name: nickname
         });
 
         showMessage('会員登録が完了しました！登録完了メールをご確認ください。', 'success');
