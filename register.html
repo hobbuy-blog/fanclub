@@ -177,18 +177,23 @@
 <body>
   <header>
     <div class="site-title"><a href="../index.html"><b style="font-size: 1.5em;">Hobbuy Blog</b><br><b><small>趣味と購入のブログ</small></b></a></div>
+    <nav>
+      <a href="#top">ページトップ</a>
+    </nav>
   </header>
 
-  <h2>Hobbuy Blogファンクラブ 会員登録</h2>
+  <section id="top">
+    <h2>Hobbuy Blogファンクラブ 会員登録</h2>
+  </section>
 
   <div id="statusMessage" class="message"></div>
 
   <div class="form-container">
-    <p>下記の必要事項をご入力の上，会員登録を行ってください．</p>
+    <p>下記の必要事項をご入力の上、会員登録を行ってください。</p>
     
     <form id="registrationForm">
       <div class="form-group">
-        <label for="nickname">お名前 (ニックネーム) <span class="required">*</span></label>
+        <label for="nickname">ニックネーム <span class="required">*</span></label>
         <input type="text" id="nickname" name="nickname" required minlength="2" maxlength="20" placeholder="例: Hobbuy太郎">
       </div>
 
@@ -216,7 +221,7 @@
       </div>
 
       <div class="recaptcha-container">
-        <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+        <div class="g-recaptcha" data-sitekey="6LdcGA8sAAAAAGV3YKHoPvDK_4yoNuedWM1FlRWv"></div>
       </div>
 
       <button type="submit" class="submit-btn" id="submitBtn">会員登録する</button>
@@ -228,9 +233,9 @@
   </p>
 
   <script>
-    // Firebase設定（実際の設定値に置き換えてください）
+    // Firebase設定
     const firebaseConfig = {
-      Key: "AIzaSyA0BVdikPhww1qvKfLQBDIejf3En20zHnU",
+      apiKey: "AIzaSyA0BVdikPhww1qvKfLQBDIejf3En20zHnU",
       authDomain: "hobbuy-blog-fan.firebaseapp.com",
       databaseURL: "https://hobbuy-blog-fan-default-rtdb.firebaseio.com",
       projectId: "hobbuy-blog-fan",
@@ -244,7 +249,7 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // EmailJS初期化（実際のユーザーIDに置き換えてください）
+    // EmailJS初期化
     emailjs.init("huwikhPrEgQGUlhwI");
 
     // パスワード強度チェック
@@ -291,14 +296,14 @@
       const confirmPassword = document.getElementById('confirmPassword').value;
       
       if (password !== confirmPassword) {
-        showMessage('パスワードが一致しません．', 'error');
+        showMessage('パスワードが一致しません。', 'error');
         return;
       }
 
       // reCAPTCHA確認
       const recaptchaResponse = grecaptcha.getResponse();
       if (!recaptchaResponse) {
-        showMessage('reCAPTCHA認証を完了してください．', 'error');
+        showMessage('reCAPTCHA認証を完了してください。', 'error');
         return;
       }
 
@@ -312,7 +317,7 @@
         // メールアドレスの重複チェック
         const emailCheck = await database.ref('users').orderByChild('email').equalTo(email).once('value');
         if (emailCheck.exists()) {
-          showMessage('このメールアドレスは既に登録されています．', 'error');
+          showMessage('このメールアドレスは既に登録されています。', 'error');
           submitBtn.disabled = false;
           submitBtn.textContent = '会員登録する';
           return;
@@ -334,10 +339,10 @@
         await emailjs.send('service_70cfhpd', 'registerComplete', {
           to_email: email,
           to_name: nickname,
-          message: 'Hobbuy Blogファンクラブへのご登録ありがとうございます．'
+          message: 'Hobbuy Blogファンクラブへのご登録ありがとうございます。'
         });
 
-        showMessage('会員登録が完了しました！登録完了をご確認ください．', 'success');
+        showMessage('会員登録が完了しました！登録完了メールをご確認ください。', 'success');
         form.reset();
         grecaptcha.reset();
         
@@ -348,7 +353,7 @@
 
       } catch (error) {
         console.error('登録エラー:', error);
-        showMessage('登録中にエラーが発生しました．もう一度お試しください．', 'error');
+        showMessage('登録中にエラーが発生しました。もう一度お試しください。', 'error');
         submitBtn.disabled = false;
         submitBtn.textContent = '会員登録する';
       }
