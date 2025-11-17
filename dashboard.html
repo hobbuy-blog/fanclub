@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Hobbuy-Blog, bockring">
+  <title>ダッシュボード | Hobbuy Blog ファンクラブ</title>
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+  <style>
+    html {
+      scroll-padding-top: 100px;
+    }
+    body {
+      font-family: "Yu Gothic", "Meiryo", "MS PGothic", "Osaka", "Hiragino Kaku Gothic Pro", sans-serif;
+      background: #fafafa;
+      color: #222;
+      margin: 2rem auto;
+      max-width: 900px;
+      padding: 1rem;
+      line-height: 1.7;
+      padding-top: 70px;
+    }
+    h1, h2, h3 {
+      font-weight: bold;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 0.3em;
+    }
+    h3 {
+      font-size: 1.2em;
+      margin-top: 1.5em;
+    }
+    a {
+      color: #0055a4;
+    }
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 0.5em 0.25em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    .site-title {
+      color: #fff;
+      font-size: 1em;
+      letter-spacing: 0px;
+    }
+    .site-title a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    nav {
+      margin-left: 2em;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 1em;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    nav a:hover {
+      color: rgba(255,255,255,0.75);
+    }
+
+    .welcome-section {
+      background: linear-gradient(135deg, #0055a4 0%, #003d7a 100%);
+      color: #fff;
+      padding: 2em;
+      border-radius: 8px;
+      margin-top: 2em;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .welcome-section h2 {
+      border: none;
+      margin: 0 0 0.5em 0;
+      padding: 0;
+      color: #fff;
+    }
+    .welcome-section p {
+      margin: 0;
+      font-size: 0.95em;
+      opacity: 0.9;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1em;
+      margin-top: 2em;
+    }
+    .stat-card {
+      background: #fff;
+      padding: 1.5em;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .stat-card .label {
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 0.5em;
+    }
+    .stat-card .value {
+      font-size: 2em;
+      font-weight: bold;
+      color: #0055a4;
+    }
+    .stat-card .subtext {
+      font-size: 0.85em;
+      color: #999;
+      margin-top: 0.3em;
+    }
+
+    .section-container {
+      background: #fff;
+      padding: 2em;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-top: 2em;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1em;
+      margin-top: 1em;
+    }
+    .menu-card {
+      background: #f9f9f9;
+      padding: 1.5em;
+      border-radius: 8px;
+      border: 2px solid #e0e0e0;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: #222;
+      display: block;
+    }
+    .menu-card:hover {
+      border-color: #0055a4;
+      background: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,85,164,0.1);
+    }
+    .menu-card h4 {
+      margin: 0 0 0.5em 0;
+      color: #0055a4;
+      font-size: 1.1em;
+    }
+    .menu-card p {
+      margin: 0;
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .news-list {
+      list-style: none;
+      padding: 0;
+      margin: 1em 0 0 0;
+    }
+    .news-item {
+      padding: 1em;
+      border-bottom: 1px solid #e0e0e0;
+      transition: background 0.2s;
+    }
+    .news-item:hover {
+      background: #f9f9f9;
+    }
+    .news-item:last-child {
+      border-bottom: none;
+    }
+    .news-date {
+      font-size: 0.85em;
+      color: #999;
+      margin-right: 1em;
+    }
+    .news-title {
+      color: #0055a4;
+      font-weight: 500;
+    }
+    .news-badge {
+      display: inline-block;
+      padding: 0.2em 0.6em;
+      background: #0055a4;
+      color: #fff;
+      font-size: 0.75em;
+      border-radius: 3px;
+      margin-left: 0.5em;
+    }
+    .news-badge.new {
+      background: #f20;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 1em;
+      flex-wrap: wrap;
+      margin-top: 1em;
+    }
+    .btn {
+      padding: 0.7em 1.5em;
+      border: none;
+      border-radius: 4px;
+      font-size: 1em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary {
+      background-color: #0055a4;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background-color: #003d7a;
+    }
+    .btn-secondary {
+      background-color: #6c757d;
+      color: #fff;
+    }
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+    .btn-outline {
+      background-color: transparent;
+      color: #0055a4;
+      border: 2px solid #0055a4;
+    }
+    .btn-outline:hover {
+      background-color: #0055a4;
+      color: #fff;
+    }
+
+    .user-status {
+      display: inline-block;
+      padding: 0.3em 0.8em;
+      background: #28a745;
+      color: #fff;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 500;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="site-title"><a href="../index.html"><b style="font-size: 1.5em;">Hobbuy Blog</b><br><b><small>趣味と購入のブログ</small></b></a></div>
+  </header>
+
+  <div id="loadingMessage" class="loading">
+    <p>読み込み中...</p>
+  </div>
+
+  <div id="dashboardContent" style="display: none;">
+    <!-- ウェルカムセクション -->
+    <div class="welcome-section">
+      <h2>ようこそ，<span id="userName">ゲスト</span>さん！ <span class="user-status">会員</span></h2>
+      <p>Hobbuy Blogファンクラブへようこそ．最新情報やコンテンツをお楽しみください．</p>
+    </div>
+
+    <!-- 統計情報 -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label">会員歴</div>
+        <div class="value" id="memberDays">0</div>
+        <div class="subtext">日</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">最終ログイン</div>
+        <div class="value" id="lastLoginDisplay">---</div>
+        <div class="subtext">日前</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">会員ステータス</div>
+        <div class="value" style="font-size: 1.5em;">✓</div>
+        <div class="subtext">アクティブ</div>
+      </div>
+    </div>
+
+    <!-- お知らせ -->
+    <div class="section-container">
+      <h3>📢 お知らせ</h3>
+      <ul class="news-list">
+        <li class="news-item">
+          <span class="news-date">2025-11-17</span>
+          <span class="news-title">ファンクラブサイトがオープンしました！</span>
+          <span class="news-badge new">NEW</span>
+        </li>
+        <li class="news-item">
+          <span class="news-date">2025-11-15</span>
+          <span class="news-title">会員登録システムが利用可能になりました</span>
+        </li>
+        <li class="news-item">
+          <span class="news-date">2025-11-10</span>
+          <span class="news-title">Hobbuy Blogファンクラブ準備開始</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- メニュー -->
+    <div class="section-container">
+      <h3>🔧 メニュー</h3>
+      <div class="menu-grid">
+        <a href="./settings.html" class="menu-card">
+          <h4>⚙️ ユーザー設定</h4>
+          <p>アカウント情報の確認・変更，パスワード変更，アカウント削除</p>
+        </a>
+        <a href="../index.html" class="menu-card">
+          <h4>📝 ブログを見る</h4>
+          <p>Hobbuy Blogのメインページへ</p>
+        </a>
+        <a href="#" class="menu-card" onclick="alert('準備中の機能です'); return false;">
+          <h4>📧 お問い合わせ</h4>
+          <p>ご質問やご要望をお送りください</p>
+        </a>
+        <a href="#" class="menu-card" onclick="alert('準備中の機能です'); return false;">
+          <h4>📚 限定コンテンツ</h4>
+          <p>会員限定の記事やコンテンツ</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- クイックアクション -->
+    <div class="section-container">
+      <h3>⚡ クイックアクション</h3>
+      <div class="quick-actions">
+        <a href="./settings.html" class="btn btn-primary">ユーザー設定</a>
+        <a href="../index.html" class="btn btn-outline">ブログトップへ</a>
+        <a href="#" class="btn btn-secondary" id="logoutBtn">ログアウト</a>
+      </div>
+    </div>
+
+    <!-- アカウント情報サマリー -->
+    <div class="section-container">
+      <h3>👤 アカウント情報</h3>
+      <p><strong>メールアドレス：</strong><span id="userEmail">---</span></p>
+      <p><strong>登録日時：</strong><span id="registeredDate">---</span></p>
+      <p><strong>ユーザーID：</strong><span id="userId" style="font-family: monospace; font-size: 0.9em; color: #666;">---</span></p>
+    </div>
+
+    <p style="margin-top: 2em; text-align: center; color: #666;">
+      <a href="./index.html">←ファンクラブトップに戻る</a>
+    </p>
+  </div>
+
+  <script>
+    // Firebase設定
+    const firebaseConfig = {
+      apiKey: "AIzaSyA0BVdikPhww1qvKfLQBDIejf3En20zHnU",
+      authDomain: "hobbuy-blog-fan.firebaseapp.com",
+      databaseURL: "https://hobbuy-blog-fan-default-rtdb.firebaseio.com",
+      projectId: "hobbuy-blog-fan",
+      storageBucket: "hobbuy-blog-fan.firebasestorage.app",
+      messagingSenderId: "957393727956",
+      appId: "1:957393727956:web:123cb8792e256b8ca22641",
+      measurementId: "G-RHVS30RRQZ"
+    };
+
+    // Firebase初期化
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Cookie操作関数
+    function getCookie(name) {
+      var nameEQ = name + "=";
+      var ca = document.cookie.split(';');
+      for(var i=0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
+    }
+
+    function deleteCookie(name) {
+      document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    }
+
+    // 日数計算
+    function calculateDaysSince(dateString) {
+      const date = new Date(dateString);
+      const today = new Date();
+      const diffTime = Math.abs(today - date);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays;
+    }
+
+    // ページ読み込み時の処理
+    document.addEventListener('DOMContentLoaded', async function() {
+      const userId = getCookie('fanclub_user_id');
+      
+      if (!userId) {
+        alert('ログインが必要です．');
+        window.location.href = './login.html';
+        return;
+      }
+
+      try {
+        const snapshot = await database.ref('users/' + userId).once('value');
+        
+        if (!snapshot.exists()) {
+          alert('ユーザー情報が見つかりません．');
+          window.location.href = './login.html';
+          return;
+        }
+
+        const userData = snapshot.val();
+        
+        // ユーザー情報を表示
+        document.getElementById('userName').textContent = userData.nickname;
+        document.getElementById('userEmail').textContent = userData.email;
+        document.getElementById('userId').textContent = userId;
+        
+        // 登録日時
+        const registeredDate = new Date(userData.registeredAt);
+        document.getElementById('registeredDate').textContent = 
+          registeredDate.toLocaleString('ja-JP');
+        
+        // 会員歴（日数）
+        const memberDays = calculateDaysSince(userData.registeredAt);
+        document.getElementById('memberDays').textContent = memberDays;
+        
+        // 最終ログイン
+        if (userData.lastLogin) {
+          const lastLoginDays = calculateDaysSince(userData.lastLogin);
+          if (lastLoginDays === 0) {
+            document.getElementById('lastLoginDisplay').textContent = '今日';
+          } else {
+            document.getElementById('lastLoginDisplay').textContent = lastLoginDays;
+          }
+        } else {
+          document.getElementById('lastLoginDisplay').textContent = '初回';
+          document.getElementById('lastLoginDisplay').nextElementSibling.textContent = 'ログイン';
+        }
+
+        // コンテンツを表示
+        document.getElementById('loadingMessage').style.display = 'none';
+        document.getElementById('dashboardContent').style.display = 'block';
+
+      } catch (error) {
+        console.error('データ読み込みエラー:', error);
+        alert('データの読み込みに失敗しました．');
+        window.location.href = './login.html';
+      }
+    });
+
+    // ログアウト
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      if (confirm('ログアウトしますか？')) {
+        deleteCookie('fanclub_user_id');
+        deleteCookie('fanclub_user_email');
+        deleteCookie('fanclub_user_nickname');
+        
+        alert('ログアウトしました．');
+        window.location.href = './index.html';
+      }
+    });
+  </script>
+</body>
+</html>
