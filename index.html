@@ -99,6 +99,18 @@
     nav a:hover {
       color: rgba(0,0,0,0.25);
     }
+    .submit-btn {
+      width: 100%;
+      padding: 1em;
+      background-color: #0055a4;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 1.1em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
   </style>
 </head>
 <!-- 
@@ -119,9 +131,12 @@ Link style:
   <p>
     こちらはHobbuy Blogファンクラブです。<br>
     会員登録制ですが、無料となっています。<br>
-    サービス開始時期は未定ですから、いつ本格始動するか分かりません。<br>
-    大変ご迷惑をおかけしますが、私がシステムの準備を終えた段階での開始となりますので。お待ちください。
+    サービス開始時期は未定ですから、いつ本格始動するか分かりません。<br><br>
+
+    アカウント管理系のシステムは完成したので、以下のリンクから登録とログインが行えます。
   </p>
+  <button type="submit" class="submit-btn" onclick="location.href = './login.html'">ログイン</button>
+  <button type="submit" class="submit-btn" onclick="location.href = './register.html">新規登録</button>
   <a href="./../hobbuying/index.html">←ブログページへ戻る</a>
 
 
